@@ -1,0 +1,42 @@
+---
+title: "Q2(b)-network"
+author: "Fuchenchu Wang"
+date: "November 14, 2015"
+output: html_document
+---
+---
+```{r, echo=FALSE}
+setwd="C:/Users/Delia Wang/Desktop/R/work/network"
+set.seed (3214)
+```
+
+```{r}
+library(igraph)
+data=read.table("Q2(b)_beta coefficients.txt",sep="\t",header=T,row.names =1)
+data=as.matrix(data)
+nodegroup=list()
+nodegroup$cell=colnames(data)[1:5]
+nodegroup$phylum=colnames(data)[6:21]
+name=data[1:21,1:21]
+obvious =name
+obvious[ lower.tri(obvious, diag=TRUE) ]<- 0
+cutoff =10
+obvious[ abs(obvious) < cutoff]<- 0
+network=graph.adjacency(abs(obvious)>cutoff, weighted=TRUE, mode="upper")
+E(network)$weight=obvious[abs(obvious)>cutoff]
+E(network)$color[ E(network)$weight <0 ] = "blue"
+E(network)$color[ E(network)$weight >= 0 ] = "red"
+V(network)$label= colnames(name)
+V(network)$label.color="black"
+V(network)$label.cex=0.9
+V(network)$size=10
+V(network)$font=2
+V(network)[6:21]$color ="lightblue"
+V(network)[1:5]$color <- "pink"
+par(mai = c(0, 0, 0, 0))
+layout1 <- layout.fruchterman.reingold(network)
+network$layout <- layout.fruchterman.reingold
+edge=abs(E(network)$weight)
+plot(decompose.graph(network)[[which.max(sapply(decompose.graph(network), vcount))]],edge.width =edge/100,frame=T) 
+```
+
